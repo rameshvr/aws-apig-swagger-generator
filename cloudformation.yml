@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: aws-apig-swagger-generator
+Parameters:
+  BucketName:
+    Description: Name of bucket to host swagger. Account number will be appended to this name.
+    Type: String
+    Default: swagger-server
+Resources:
+  SwaggerHost:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Ref BucketName
+      PublicAccessBlockConfiguration: {} #TODO
+      Tags:
+        - Key: ApplicationName
+          Value: aws-apig-swagger-generator
+      WebsiteConfiguration: {} #TODO
+  SwaggerHostPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref SwaggerHost
+      PolicyDocument: {} #TODO
+  APIGMonitorRule:
+    Type: 'AWS::Events::Rule'
+    Properties:
+      Description: String
+      EventBusName: String
+      EventPattern: Json
+      Name: String
+      RoleArn: String
+      ScheduleExpression: String
+      State: String
+      Targets:
+        - Target
+  SwaggerGeneratorLambda:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code: {} #required TODO
+      DeadLetterConfig: DeadLetterConfig
+      Description: String
+      Environment: Environment
+      FunctionName: String
+      Handler: String #required
+      KmsKeyArn: String
+      Layers:
+        - String
+      MemorySize: Integer
+      ReservedConcurrentExecutions: Integer
+      Role: String #required
+      Runtime: String #required
+      Tags:
+        - Key: ApplicationName
+          Value: aws-apig-swagger-generator
+Transform:
+
+Outputs:
