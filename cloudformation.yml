@@ -6,7 +6,7 @@ Parameters:
     Type: String
     Default: swagger-server
 Resources:
-  SwaggerHost:
+  SwaggerHostBucket:
     Type: 'AWS::S3::Bucket'
     Properties:
       BucketName: !Ref BucketName
@@ -18,7 +18,7 @@ Resources:
   SwaggerHostPolicy:
     Type: 'AWS::S3::BucketPolicy'
     Properties:
-      Bucket: !Ref SwaggerHost
+      Bucket: !Ref SwaggerHostBucket
       PolicyDocument: {} #TODO
   APIGMonitorRule:
     Type: 'AWS::Events::Rule'
@@ -36,21 +36,49 @@ Resources:
     Type: 'AWS::Lambda::Function'
     Properties:
       Code: {} #required TODO
-      DeadLetterConfig: DeadLetterConfig
-      Description: String
-      Environment: Environment
-      FunctionName: String
-      Handler: String #required
-      KmsKeyArn: String
-      Layers:
-        - String
-      MemorySize: Integer
-      ReservedConcurrentExecutions: Integer
-      Role: String #required
-      Runtime: String #required
+      Description: Lambda function to generate swagger yaml from apig deployment
+      Environment:
+        Variables:
+          bucketName: !Ref SwaggerHostBucket
+      FunctionName: SwaggerGeneratorLambda
+      Handler: index.handler
+      Role: !Ref LambdaExecutionRole
+      Runtime: nodejs12.x
       Tags:
         - Key: ApplicationName
           Value: aws-apig-swagger-generator
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+        Version: 2012-10-17
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSLambdaExecute
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+      Policies:
+        - PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Effect: 'Allow'
+                Resource: '*'
+          PolicyName: 'lambda'
+      Path: /
+      RoleName: LambdaExecutionRole
+      Tags:
+        - Key: ApplicationName
+          Value: aws-apig-swagger-generator
+
 Transform:
 
 Outputs:
