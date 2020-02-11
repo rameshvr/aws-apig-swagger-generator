@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Deploy new APIG
+Parameters:
+  APIGName:
+    Description: Name of the APIG
+    Type: String
+    Default: your-apig-name
+  StageName:
+    Type: 'String'
+    AllowedPattern: '^[a-z0-9]+$'
+    Default: dev
+Resources:
+  apiGateway:
+    Type: 'AWS::ApiGateway::RestApi'
+    Properties:
+      Name: !Ref APIGName
+  apiGatewayRootMethod:
+    Type: 'AWS::ApiGateway::Method'
+    Properties:
+      AuthorizationType: 'NONE'
+      HttpMethod: 'POST'
+      Integration:
+        IntegrationHttpMethod: 'MOCK'
+      ResourceId: !GetAtt 'apiGateway.RootResourceId'
+      RestApiId: !Ref 'apiGateway'
+  apiGatewayDeployment:
+    Type: 'AWS::ApiGateway::Deployment'
+    DependsOn:
+      - 'apiGatewayRootMethod'
+    Properties:
+      RestApiId: !Ref 'apiGateway'
+      StageName: !Ref 'StageName'
+
+Outputs:
