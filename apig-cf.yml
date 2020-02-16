@@ -17,11 +17,11 @@ Resources:
   apiGatewayRootMethod:
     Type: 'AWS::ApiGateway::Method'
     Properties:
-      AuthorizationType: 'NONE'
-      HttpMethod: 'POST'
+      ResourceId: !GetAtt apiGateway.RootResourceId
+      HttpMethod: GET
+      AuthorizationType: NONE
       Integration:
-        IntegrationHttpMethod: 'MOCK'
-      ResourceId: !GetAtt 'apiGateway.RootResourceId'
+        Type: MOCK
       RestApiId: !Ref 'apiGateway'
   apiGatewayDeployment:
     Type: 'AWS::ApiGateway::Deployment'
@@ -30,5 +30,3 @@ Resources:
     Properties:
       RestApiId: !Ref 'apiGateway'
       StageName: !Ref 'StageName'
-
-Outputs:
