@@ -10,39 +10,85 @@ Resources:
     Type: 'AWS::S3::Bucket'
     Properties:
       BucketName: !Ref BucketName
-      PublicAccessBlockConfiguration: {} #TODO
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: false
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
       Tags:
         - Key: ApplicationName
           Value: aws-apig-swagger-generator
-      WebsiteConfiguration: {} #TODO
+      WebsiteConfiguration:
+        ErrorDocument: index.html
+        IndexDocument: index.html
   SwaggerHostPolicy:
     Type: 'AWS::S3::BucketPolicy'
     Properties:
       Bucket: !Ref SwaggerHostBucket
-      PolicyDocument: {} #TODO
+      # TODO: Add cloudfront OAI
+      PolicyDocument:
+        Statement:
+          - Action:
+              - 's3:GetObject'
+            Effect: 'Allow'
+            Resource:
+              Fn::Join:
+                - ''
+                - - 'arn:aws:s3:::'
+                  - !Ref 'SwaggerHostBucket'
+                  - '/*'
+            Principal: '*'
   APIGMonitorRule:
     Type: 'AWS::Events::Rule'
     Properties:
-      Description: String
-      EventBusName: String
-      EventPattern: Json
-      Name: String
-      RoleArn: String
-      ScheduleExpression: String
-      State: String
+      Description: Rule to monitor APIG Changes
+      EventPattern: { 'source': ['aws.apigateway'] }
+      Name: apig-deployment-monitor
+      State: ENABLED
       Targets:
-        - Target
+        - Arn: !GetAtt SwaggerGeneratorLambda.Arn
+          Id: SwaggerGeneratorLambdaV1
+  PermissionForEventsToInvokeLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref SwaggerGeneratorLambda
+      Action: 'lambda:InvokeFunction'
+      Principal: 'events.amazonaws.com'
+      SourceArn: !GetAtt APIGMonitorRule.Arn
   SwaggerGeneratorLambda:
     Type: 'AWS::Lambda::Function'
     Properties:
-      Code: {} #required TODO
+      Code:
+        ZipFile: |
+          var aws = require('aws-sdk')
+          var response = require('cfn-response')
+          exports.handler = function(event, context) {
+              console.log("REQUEST RECEIVED:\n" + JSON.stringify(event))
+              // For Delete requests, immediately send a SUCCESS response.
+              if (event.RequestType == "Delete") {
+                  response.send(event, context, "SUCCESS")
+                  return
+              }
+              var responseStatus = "FAILED"
+              var responseData = {}
+              var functionName = event.ResourceProperties.FunctionName
+              var lambda = new aws.Lambda()
+              lambda.invoke({ FunctionName: functionName }, function(err, invokeResult) {
+                  if (err) {
+                      responseData = {Error: "Invoke call failed"}
+                      console.log(responseData.Error + ":\n", err)
+                  }
+                  else responseStatus = "SUCCESS"
+                  response.send(event, context, responseStatus, responseData)
+              })
+          }
       Description: Lambda function to generate swagger yaml from apig deployment
       Environment:
         Variables:
           bucketName: !Ref SwaggerHostBucket
       FunctionName: SwaggerGeneratorLambda
       Handler: index.handler
-      Role: !Ref LambdaExecutionRole
+      Role: 'arn:aws:iam::041147519409:role/LambdaExecutionRoles'
       Runtime: nodejs12.x
       Tags:
         - Key: ApplicationName
@@ -61,7 +107,7 @@ Resources:
         Version: 2012-10-17
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSLambdaExecute
-        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       Policies:
         - PolicyDocument:
             Version: '2012-10-17'
@@ -70,15 +116,17 @@ Resources:
                   - 'logs:CreateLogGroup'
                   - 'logs:CreateLogStream'
                   - 'logs:PutLogEvents'
+                  - 'apigateway:GET'
+                  - 's3:Get*'
+                  - 's3:DeleteObject'
+                  - 's3:Put*'
+                  - 's3:ListBucket'
                 Effect: 'Allow'
                 Resource: '*'
-          PolicyName: 'lambda'
+          PolicyName: 'lambdaExec'
       Path: /
-      RoleName: LambdaExecutionRole
+      # TODO: Change the role name later
+      RoleName: lambdaExecutionRoleBeta
       Tags:
         - Key: ApplicationName
           Value: aws-apig-swagger-generator
-
-Transform:
-
-Outputs:
