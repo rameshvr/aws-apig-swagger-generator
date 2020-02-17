@@ -1,37 +1,13 @@
-## Welcome to GitHub Pages
+## APIG - Generate Swagger and Host in S3. Automatically on each deployment.
 
-You can use the [editor on GitHub](https://github.com/rameshvr/aws-apig-swagger-generator/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+This stack will do following:
+1. continuously monitor the APIG
+2. on every APIG deployment, auto generate Swagger and uploads to S3 bucket.
+3. Swagger documentation stays up to date with your APIG.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/rameshvr/aws-apig-swagger-generator/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+Resources Created:
+1. S3 Bucket & Bucket Policy
+2. Lambda function
+3. CloudWatch Rule
+4. APIG (this is optional, you can use existing one)
+5. IAM Roles 
