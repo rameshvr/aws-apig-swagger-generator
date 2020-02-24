@@ -108,7 +108,7 @@ Resources:
           bucketName: !Ref SwaggerHostBucket
       FunctionName: SwaggerGeneratorLambda
       Handler: index.handler
-      Role: 'arn:aws:iam::041147519409:role/LambdaExecutionRoles'
+      Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/LambdaExecutionRoles'
       Runtime: nodejs12.x
       Tags:
         - Key: ApplicationName
