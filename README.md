@@ -1,5 +1,4 @@
-## APIG - Generate Swagger and Host in S3. Automatically on each deployment.
-
+## APIG - Generate Swagger and Host in S3 with real time sync.
 This stack will do following:
 1. Continuously monitor the APIG
 2. On every APIG deployment, auto generate Swagger and uploads to S3 bucket.
