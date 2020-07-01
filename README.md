@@ -12,4 +12,4 @@
 2. Lambda function
 3. CloudWatch Rule
 4. APIG (this is optional, you can use existing one)
-5. IAM Roles 
+5. IAM Roles
