@@ -1,4 +1,4 @@
-## APIG - Generate Swagger and Host in S3 with real time sync.
+## APIG - Generate Swagger and Host in S3 with real time sync
 
 ### This stack will do following
 
