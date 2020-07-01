@@ -68,7 +68,7 @@ Resources:
             // console.log('Received event:', JSON.stringify(event, null, 2));
             // const invokeEvent = JSON.parse(JSON.stringify(event.invokingEvent));
             // console.log('event =', invokeEvent);
-            // if (invokeEvent.configurationItem.ARN === "arn:aws:apigateway:us-east-1::/restapis/gw0oyswl80/stages/dev") {
+            // if (invokeEvent.configurationItem.ARN === "arn:aws:apigateway:us-east-1::/restapis/****/stages/dev") {
               //   console.log('dev deployment changed');
               // }
             var params = {
